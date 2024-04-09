@@ -827,3 +827,29 @@ Function Redo-LTService{
                         Write-Debug "Exiting $($myInvocation.InvocationName) at line $(LINENUM)"
                     }#End End
                 }#End Function Start-LTService
+
+Function Initiate-Fix {
+    Param(
+        [string]$token
+    )
+    # Attempt to restart service
+    try {
+        Restart-LTService
+    }
+    catch {
+        [bool]$restart_failed = $true
+    }
+
+    # Attempt to reinstall service
+    try {
+        if ($restart_failed -eq $true) {
+            Redo-LTService -InstallerToken $token
+        }
+    }
+    catch {
+        [bool]$reinstall_failed -eq $true
+    }
+}
+
+###############
+Initiate-Fix -token 'asdfasdf'
